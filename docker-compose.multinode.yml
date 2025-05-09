@@ -28,6 +28,7 @@ services:
       JAVA_HEAP_MIN: "${PLATFORM_JAVA_HEAP_MIN}"
       JAVA_HEAP_MAX: "${PLATFORM_JAVA_HEAP_MAX}"
       JAVA_OPTS: "${PLATFORM_JAVA_OPTS}"
+      CONSENSUS_NODE_ID: "1"
     healthcheck:
       test:
         [
@@ -70,6 +71,11 @@ services:
   network-node-2:
     <<: *network-node-definition
     container_name: network-node-2
+    environment:
+      JAVA_HEAP_MIN: "${PLATFORM_JAVA_HEAP_MIN}"
+      JAVA_HEAP_MAX: "${PLATFORM_JAVA_HEAP_MAX}"
+      JAVA_OPTS: "${PLATFORM_JAVA_OPTS}"
+      CONSENSUS_NODE_ID: "2"  
     depends_on:
       haveged:
         condition: service_started
@@ -87,6 +93,11 @@ services:
   network-node-3:
     <<: *network-node-definition
     container_name: network-node-3
+    environment:
+      JAVA_HEAP_MIN: "${PLATFORM_JAVA_HEAP_MIN}"
+      JAVA_HEAP_MAX: "${PLATFORM_JAVA_HEAP_MAX}"
+      JAVA_OPTS: "${PLATFORM_JAVA_OPTS}"
+      CONSENSUS_NODE_ID: "3"    
     depends_on:
       haveged:
         condition: service_started
@@ -221,3 +232,18 @@ services:
   importer:
     volumes:
       - ./compose-network/mirror-node/addressBook.multinode.bin:/usr/etc/hedera-mirror-importer/local-dev-1-node.addressbook.f102.json.bin
+
+  monitor:
+    depends_on:
+      grpc:
+        condition: service_started
+      rest:
+        condition: service_started
+      network-node:
+        condition: service_healthy
+      network-node-1:
+        condition: service_healthy
+      network-node-2:
+        condition: service_healthy
+      network-node-3:
+        condition: service_healthy
